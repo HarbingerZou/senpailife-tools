@@ -273,7 +273,7 @@ function EventsInSingleLine(eventsList: TimelineEvent[], startDate: Date, dayCou
 
         const pictureUrl = "https://picsum.photos/200/300"
         // Fetch the dominant color from the image URL
-        getDominantColorFromUrl(pictureUrl, (dominantColor) => {
+        getAverageColorFromUrl(pictureUrl, (dominantColor) => {
             // Apply a gradient that fades from the dominant color (right) to transparent (left)
             bannerBackgroundLayer.style.backgroundImage = `linear-gradient(to left, rgba(${dominantColor}, 0) 0%, rgb(${dominantColor}) 100%), url(${pictureUrl})`;
             bannerBackgroundLayer.style.backgroundSize = `cover`; // Ensure the image fits the layer
@@ -287,17 +287,24 @@ function EventsInSingleLine(eventsList: TimelineEvent[], startDate: Date, dayCou
 }
 
 
-function getDominantColorFromUrl(imageUrl: string, callback: (dominantColor: string) => void): void {
+function getAverageColorFromUrl(imageUrl: string, callback: (averageColor: string) => void): void {
     // Create an image element
-    const img = new Image();
-    img.crossOrigin = "Anonymous"; // This allows loading from different origins if necessary
+    const img: HTMLImageElement = new Image();
+    img.crossOrigin = "Anonymous"; // Handle cross-origin requests
     img.src = imageUrl;
 
-    // Once the image is loaded, calculate the dominant color
+    // Once the image is loaded, calculate the average color
     img.onload = () => {
         // Create a canvas element to draw the image and extract pixel data
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d')!;
+        const canvas: HTMLCanvasElement = document.createElement('canvas');
+        const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d');
+
+        if (!ctx) {
+            console.error('Could not get canvas context');
+            callback('0, 0, 0');
+            return;
+        }
+
         canvas.width = img.width;
         canvas.height = img.height;
 
@@ -305,45 +312,44 @@ function getDominantColorFromUrl(imageUrl: string, callback: (dominantColor: str
         ctx.drawImage(img, 0, 0);
 
         // Get pixel data
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
+        const imageData: ImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data: Uint8ClampedArray = imageData.data;
 
-        // Object to store the frequency of each color
-        const colorCount: { [key: string]: number } = {};
-        let dominantColor = '';
-        let maxCount = 0;
+        // Variables to store the sum of all R, G, B values
+        let rTotal = 0, gTotal = 0, bTotal = 0;
+        let pixelCount = 0;
 
-        // Helper function to bucket colors (rounding to the nearest 10 or so)
-        function simplifyColorValue(value: number): number {
-            return Math.floor(value / 10) * 10; // Round to the nearest 10 to reduce variations
-        }
-
-        // Iterate through pixel data to count the frequency of each RGB color
+        // Iterate through pixel data and sum up all the RGB values
         for (let i = 0; i < data.length; i += 4) {
-            const r = simplifyColorValue(data[i]);
-            const g = simplifyColorValue(data[i + 1]);
-            const b = simplifyColorValue(data[i + 2]);
-            const color = `${r},${g},${b}`;
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
 
-            // Count the color frequency
-            colorCount[color] = (colorCount[color] || 0) + 1;
+            // Sum the red, green, and blue values
+            rTotal += r;
+            gTotal += g;
+            bTotal += b;
 
-            // Check if it's the most frequent color
-            if (colorCount[color] > maxCount) {
-                maxCount = colorCount[color];
-                dominantColor = color;
-            }
+            // Count the number of pixels processed
+            pixelCount++;
         }
 
-        // Return the dominant color in the format 'rgb(r, g, b)'
-        callback(`${dominantColor}`);
+        // Calculate the average RGB values
+        const rAvg = Math.round(rTotal / pixelCount);
+        const gAvg = Math.round(gTotal / pixelCount);
+        const bAvg = Math.round(bTotal / pixelCount);
+
+        // Return the average color in the format 'rgb(r, g, b)'
+        callback(`${rAvg},${gAvg},${bAvg}`);
     };
 
+    // Error handling in case the image fails to load
     img.onerror = () => {
         console.error('Error loading image:', imageUrl);
-        callback('0,0,0'); // Fallback in case the image fails to load
+        callback('0, 0, 0'); // Fallback in case the image fails to load
     };
 }
+
 
 
 function generateLowSaturationRGB(opacity:number) {

@@ -280,59 +280,53 @@ function EventsInSingleLine(eventsList, startDate, dayCount, contentWidth) {
 function getAverageColorFromUrl(imageUrl, callback) {
     // Create an image element
     var img = new Image();
-    img.crossOrigin = "Anonymous"; 
+    img.crossOrigin = "Anonymous"; // Handle cross-origin requests
     img.src = imageUrl;
-
     // Once the image is loaded, calculate the average color
     img.onload = function () {
         // Create a canvas element to draw the image and extract pixel data
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Could not get canvas context');
+            callback('0, 0, 0');
+            return;
+        }
         canvas.width = img.width;
         canvas.height = img.height;
-
         // Draw the image on the canvas
         ctx.drawImage(img, 0, 0);
-
         // Get pixel data
         var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         var data = imageData.data;
-
         // Variables to store the sum of all R, G, B values
         var rTotal = 0, gTotal = 0, bTotal = 0;
         var pixelCount = 0;
-
         // Iterate through pixel data and sum up all the RGB values
         for (var i = 0; i < data.length; i += 4) {
             var r = data[i];
             var g = data[i + 1];
             var b = data[i + 2];
-
             // Sum the red, green, and blue values
             rTotal += r;
             gTotal += g;
             bTotal += b;
-
             // Count the number of pixels processed
             pixelCount++;
         }
-
         // Calculate the average RGB values
         var rAvg = Math.round(rTotal / pixelCount);
         var gAvg = Math.round(gTotal / pixelCount);
         var bAvg = Math.round(bTotal / pixelCount);
-
         // Return the average color in the format 'rgb(r, g, b)'
-        callback(`${rAvg},${gAvg},${bAvg}`);
+        callback("".concat(rAvg, ",").concat(gAvg, ",").concat(bAvg));
     };
-
     // Error handling in case the image fails to load
     img.onerror = function () {
         console.error('Error loading image:', imageUrl);
         callback('0, 0, 0'); // Fallback in case the image fails to load
     };
 }
-
 function generateLowSaturationRGB(opacity) {
     // Generate a base value between 50 and 200 to avoid extremes (too dark or too bright)
     var base = Math.floor(Math.random() * 101) + 100;
