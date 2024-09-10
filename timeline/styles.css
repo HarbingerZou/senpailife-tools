@@ -1,0 +1,152 @@
+/*The background*/
+#containerBox{
+    overflow-x: scroll; /* Makes the timeline horizontally scrollable */
+    max-width: 100%;
+    position: relative;
+    border: 1px solid transparent;
+    padding: 1rem;
+    border-radius: 16px;
+    margin-bottom: 5rem;
+}
+
+#timeline {
+    display: flex;
+    flex-direction: row;
+    height: 150px; /*temporary value only for avoiding potential*/
+    position: absolute;
+    box-sizing: content-box;
+}
+
+#content{
+    background-color: transparent;
+    position: absolute;
+    z-index: 10;
+}
+
+.month-days {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Centers month labels vertically */
+    flex-grow: 1;
+}
+
+.month-area {
+    border-radius: 3px;
+    width: auto; /* Set width to auto to accommodate content */
+    box-sizing: border-box;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    margin: 0rem;
+}
+
+.month-label {
+    display: inline-block;
+    position: sticky;
+    position: -webkit-sticky; /* For Safari */
+    left: 0; /* Stick to the left side */
+    white-space: nowrap; /* Prevents breaking into multiple lines */
+    font-size: larger;
+    margin: 0px;
+    padding: 0.25rem;
+}
+
+/*Area for the days and events*/
+.days{
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+}
+
+.day {
+    display: flex; /* Align days horizontally */
+    flex-direction: column;
+    align-items: center;
+    width: 50px; /* Fixed width for each day */
+    gap:1rem
+}
+.dayText {
+    width: 100%;
+    height: 1.25rem;
+    text-align: center;
+    margin: 0px;
+}
+.dayLine{
+    width: 1px;
+    background: gray;
+    flex-grow: 1;
+}
+
+#current-time{
+    display: flex;
+    position: absolute;
+    width: 1px;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    text-wrap: nowrap;
+}
+#current-time-text{
+    border-radius: 1rem;
+    padding: 0.25rem;
+    background-color: gray;
+    margin: 0rem;
+    z-index: 100;
+}
+#current-time-line{
+    width: 2px;
+    background-color: gray;
+    height: 100%;
+}
+
+#events-container{
+}
+
+.banner {
+    display: flex;
+    position: relative;
+    height: 100%;
+    align-items: center;
+    border-radius: 1rem;
+    padding: 0.25rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    box-sizing: border-box;
+}
+
+.banner-background-layer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: right center; /* Align image to the right */
+    z-index: 0; /* Behind the text */
+    border-radius: 1rem;
+}
+
+.banner-text-layer {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+.banner-text {
+    display: inline-block;
+    position: sticky;
+    position: -webkit-sticky; /* For Safari */
+    left: 0; /* Stick to the left side */
+    white-space: nowrap; /* Prevents breaking into multiple lines */
+    font-size: large;
+    margin: 0px;
+    padding: 0px;
+    z-index: 1; /* Ensure the text is above the background image */
+    /*background-color: rgba(255, 255, 255, 0.8); /* Optional: Add a semi-transparent background to improve text readability */
+}
+
+/*
+.event {
+    position: absolute;
+    background-color: #ccc;
+    border-radius: 4px;
+    padding: 5px;
+}*/
